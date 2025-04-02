@@ -13,9 +13,11 @@ import java.util.Date;
 public class JwtUtils {
 
     private final Key key;
+    private final Long expirationTime;
 
-    public JwtUtils(@Value("${JWT_SECRET_KEY}") String secret) {
+    public JwtUtils(@Value("${jwt.secret}") String secret, @Value("${jwt.expiration-time}") String expirationTime) {
         this.key = Keys.hmacShaKeyFor(secret.getBytes());
+        this.expirationTime = Long.parseLong(expirationTime);
     }
 
     public String generateToken(String email) {
