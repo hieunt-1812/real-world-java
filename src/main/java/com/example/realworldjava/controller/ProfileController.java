@@ -29,8 +29,8 @@ public class ProfileController {
 
     // DELETE /profiles/{username}/follow
     @DeleteMapping("/{username}/follow")
-    public ResponseEntity<ProfileDto> unfollowUser(@PathVariable("username") String name) {
-        ProfileDto profile = profileService.unfollowUser(name);
+    public ResponseEntity<ProfileDto> unfollowUser(@PathVariable("username") String username) {
+        ProfileDto profile = profileService.unfollowUser(username);
         return ResponseEntity.ok(profile);
     }
 }

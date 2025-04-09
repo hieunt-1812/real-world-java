@@ -4,17 +4,18 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.*;
 
-@JsonTypeName("profile")
+@JsonTypeName("article")
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.WRAPPER_OBJECT)
-@Data
-@Builder
-public class ProfileDto {
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+public class UpdateArticleDto {
 
-    private String username;
+    private String title;
 
-    private String image;
+    private String description;
 
-    private String bio;
-
-    private Boolean following;
+    private String body;
 }
+

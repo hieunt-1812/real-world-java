@@ -4,15 +4,12 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.*;
 
-@Setter
-@Getter
-@JsonTypeName("user")
+@JsonTypeName("profile")
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.WRAPPER_OBJECT)
 @Data
 @Builder
-public class User {
-
-    private String email;
+@AllArgsConstructor
+public class Profile {
 
     private String username;
 
@@ -20,7 +17,6 @@ public class User {
 
     private String bio;
 
-    private Boolean demo;
-
-    private String token;
+    @Builder.Default
+    private Boolean following = false;
 }
