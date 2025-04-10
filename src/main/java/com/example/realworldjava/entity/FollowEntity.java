@@ -9,14 +9,12 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
-@Table(name = "_user_follows", uniqueConstraints = {
-        @UniqueConstraint(name = "u_follow_following_pair_must_be_unique", columnNames = {
-                "following", "follower"})
+@Table(name = "user_follows", uniqueConstraints = {
+        @UniqueConstraint(name = "unique_follow_pair", columnNames = {
+                "following", "followedBy"})
 })
 @NoArgsConstructor
 @AllArgsConstructor
@@ -32,11 +30,11 @@ public class FollowEntity {
     private UserEntity following;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false, name = "follower")
-    private UserEntity follower;
+    @JoinColumn(nullable = false, name = "followedBy")
+    private UserEntity followedBy;
 
-    public FollowEntity(UserEntity following, UserEntity follower) {
+    public FollowEntity(UserEntity following, UserEntity followed) {
         this.following = following;
-        this.follower = follower;
+        this.followedBy = followed;
     }
 }
