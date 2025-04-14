@@ -28,7 +28,7 @@ public class ProfileService {
                 .orElseThrow(() -> new AppException(
                         Error.USER_NOT_FOUND
                 ));
-        boolean following = followRepository.findByFollowingIdAndFollowerId(user.getId(),
+        boolean following = followRepository.findByFollowingIdAndFollowedById(user.getId(),
                 currentUserEntity.getId()).isPresent();
         return ProfileDto.builder()
                 .username(user.getUsername())
@@ -46,7 +46,7 @@ public class ProfileService {
                 .orElseThrow(() -> new AppException(
                         Error.USER_NOT_FOUND
                 ));
-        followRepository.findByFollowingIdAndFollowerId(followingUser.getId(), followerUser.getId())
+        followRepository.findByFollowingIdAndFollowedById(followingUser.getId(), followerUser.getId())
                 .ifPresent(follow -> {
                     throw new AppException(Error.ALREADY_FOLLOWED_USER);
                 });
@@ -69,7 +69,7 @@ public class ProfileService {
                 .orElseThrow(() -> new AppException(
                         Error.USER_NOT_FOUND
                 ));
-        FollowEntity follow = followRepository.findByFollowingIdAndFollowerId(followingUser.getId(),
+        FollowEntity follow = followRepository.findByFollowingIdAndFollowedById(followingUser.getId(),
                         followerUser.getId())
                 .orElseThrow(() -> new AppException(Error.FOLLOW_NOT_FOUND));
         followRepository.delete(follow);

@@ -124,7 +124,7 @@ public class UserService {
         return currentUser;
     }
 
-    private UserEntity getCurrentUserEntity() {
+    protected UserEntity getCurrentUserEntity() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new AppException(Error.USER_NOT_FOUND));
