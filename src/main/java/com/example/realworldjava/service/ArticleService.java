@@ -1,6 +1,7 @@
 package com.example.realworldjava.service;
 
 import com.example.realworldjava.dto.ArticleDto;
+import com.example.realworldjava.entity.FavoriteEntity;
 import com.example.realworldjava.model.Article;
 import com.example.realworldjava.model.Article.MultiArticlesDto;
 import com.example.realworldjava.model.Article.SingleArticlesDto;
@@ -12,7 +13,9 @@ import com.example.realworldjava.entity.UserEntity;
 import com.example.realworldjava.exception.AppException;
 import com.example.realworldjava.exception.Error;
 import com.example.realworldjava.repository.ArticleRepository;
+import com.example.realworldjava.repository.FavoriteRepository;
 import com.example.realworldjava.repository.FollowRepository;
+import com.example.realworldjava.repository.TagRepository;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +38,12 @@ public class ArticleService {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private FavoriteRepository favoriteRepository;
+
+    @Autowired
+    private TagRepository tagRepository;
 
     @Transactional
     public SingleArticlesDto createArticle(ArticleDto articleDto) {
@@ -195,5 +204,55 @@ public class ArticleService {
                         .build()
                 ).toList(),
                 articleEntities.getTotalElements());
+    }
+
+    private SingleArticlesDto convertToSingleArticleDto(ArticleEntity article, UserEntity currentUser) {
+        boolean following = followRepository.findByFollowingIdAndFollowedById(
+                article.getAuthor().getId(), currentUser.getId()).isPresent();
+        boolean favorited = favoriteRepository.findByUserAndArticle(currentUser, article).isPresent();
+        int favoritesCount = favoriteRepository.countByArticle(article);
+
+        return new SingleArticlesDto(Article.builder()
+                .title(article.getTitle())
+                .slug(article.getSlug())
+                .description(article.getDescription())
+                .body(article.getBody())
+                .createdAt(article.getCreatedAt())
+                .updatedAt(article.getUpdatedAt())
+                .tagList(article.getTagList().stream().map(TagEntity::getTag).toList())
+                .author(Profile.builder()
+                        .username(article.getAuthor().getUsername())
+                        .bio(article.getAuthor().getBio())
+                        .image(article.getAuthor().getImage())
+                        .following(following)
+                        .build())
+                .favorited(favorited)
+                .favoritesCount(favoritesCount)
+                .build());
+    }
+
+    @Transactional
+    public SingleArticlesDto addFavorite(String slug) {
+        ArticleEntity article = articleRepository.findBySlug(slug)
+                .orElseThrow(() -> new AppException(Error.ARTICLE_NOT_FOUND));
+        UserEntity currentUser = userService.getCurrentUserEntity();
+        if (favoriteRepository.findByUserAndArticle(currentUser, article).isEmpty()) {
+            favoriteRepository.save(new FavoriteEntity(null, currentUser, article));
+        }
+        return convertToSingleArticleDto(article, currentUser);
+    }
+
+    @Transactional
+    public SingleArticlesDto deleteFavorite(String slug) {
+        ArticleEntity article = articleRepository.findBySlug(slug)
+                .orElseThrow(() -> new AppException(Error.ARTICLE_NOT_FOUND));
+        UserEntity currentUser = userService.getCurrentUserEntity();
+        favoriteRepository.findByUserAndArticle(currentUser, article)
+                .ifPresent(favoriteRepository::delete);
+        return convertToSingleArticleDto(article, currentUser);
+    }
+
+    public List<String> getTags() {
+        return tagRepository.findAllTags();
     }
 }
