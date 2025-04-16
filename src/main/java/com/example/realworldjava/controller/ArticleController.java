@@ -22,6 +22,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/articles")
 public class ArticleController {
@@ -86,5 +89,20 @@ public class ArticleController {
     public ResponseEntity<?> deleteComment(@PathVariable("slug") String slug, @PathVariable("commentId") Long commentId) {
         commentService.deleteComment(slug, commentId);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{slug}/favorite")
+    public ResponseEntity<SingleArticlesDto> favoriteArticle(@PathVariable String slug) {
+        return ResponseEntity.ok(articleService.addFavorite(slug));
+    }
+
+    @DeleteMapping("/{slug}/favorite")
+    public ResponseEntity<SingleArticlesDto> unfavoriteArticle(@PathVariable String slug) {
+        return ResponseEntity.ok(articleService.deleteFavorite(slug));
+    }
+
+    @GetMapping("/tags")
+    public ResponseEntity<Map<String, List<String>>> getTags() {
+        return ResponseEntity.ok(Map.of("tags", articleService.getTags()));
     }
 }
